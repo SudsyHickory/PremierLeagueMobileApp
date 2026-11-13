@@ -2,7 +2,7 @@
 
 Natywna aplikacja na Androida (Kotlin, Jetpack Compose) dla kibiców angielskiej Premier League. Łączy aktualne informacje o lidze (wyniki, terminarz, tabela) z osobistym **Dziennikiem kibica**, w którym użytkownik zapisuje wspomnienia z obejrzanych meczów – ze zdjęciami, filmami, notatką głosową i lokalizacją.
 
-> **Status:** Etap 0 – projekt i dokumentacja. Implementacja jest planowana w pionowych wycinkach (vertical slices).
+> **Status:** Etap 1 – fundament aplikacji (w toku). Implementacja przebiega w pionowych wycinkach (vertical slices).
 >
 > 📄 **Pełna dokumentacja projektu:** [Premier_League_App_opis_projektu.pdf](Premier_League_App_opis_projektu.pdf) – opis funkcji, wszystkie ekrany i ich stany, plan implementacji, podejście offline-first, strategia mocków, technologie oraz diagramy architektury MVVM.
 
@@ -76,15 +76,22 @@ Każde zapytanie do football-data.org wymaga klucza w nagłówku `X-Auth-Token`.
 
 ## Plan implementacji
 
-0. Projekt i dokumentacja
-1. Fundament aplikacji (Scaffold, nawigacja, Hilt, motyw)
-2. Model domenowy i mocki
-3. Wycinki na mockach: Tabela → Mecze → Start
-4. Baza Room i Dziennik kibica (lista i zdjęcia, następnie wideo, audio, GPS)
-5. Podłączenie API i cache offline-first
-6. Testy i oddanie
+| # | Etap |
+|---|---|
+| 0 | Projekt i dokumentacja |
+| 1 | Fundament aplikacji (Scaffold, nawigacja, Hilt, motyw) |
+| 2 | Model domenowy i mocki |
+| 3 | Wycinek 1: Tabela (na mockach) |
+| 4 | Wycinek 2: Mecze (na mockach) |
+| 5 | Wycinek 3: Start (na mockach) |
+| 6 | Baza Room |
+| 7a | Dziennik kibica: lista i zdjęcia |
+| 7b | Dziennik kibica: wideo, audio, GPS |
+| 8 | Podłączenie API |
+| 9 | Cache offline-first |
+| 10 | Testy i oddanie |
 
-Szczegóły każdego etapu – w [pełnej dokumentacji](Premier_League_App_opis_projektu.pdf).
+Szczegóły każdego etapu – w [pełnej dokumentacji](Premier_League_App_opis_projektu.pdf) oraz w [opisie projektu i etapów](docs/OPIS_PROJEKTU.md).
 
 ## Autor
 
