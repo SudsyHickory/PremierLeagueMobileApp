@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">PremierLeagueApp</string>
+    <string name="app_name">Premier League</string>
+
+    <string name="top_bar_badge">PL</string>
+
+    <string name="tab_start">Start</string>
+    <string name="tab_standings">Tabela</string>
+    <string name="tab_matches">Mecze</string>
+    <string name="tab_memories">Kibic</string>
+
+    <string name="start_subtitle">Podsumowanie ligi</string>
+    <string name="standings_subtitle">Tabela</string>
+    <string name="matches_subtitle">Mecze</string>
+    <string name="memories_subtitle">Dziennik kibica</string>
+
+    <string name="placeholder_start">Tu pojawi się podsumowanie ligi: ostatnie wyniki, najbliższe mecze i top 5 tabeli.</string>
+    <string name="placeholder_standings">Tu pojawi się pełna tabela ligowa.</string>
+    <string name="placeholder_matches">Tu pojawi się terminarz i wyniki kolejki.</string>
+    <string name="placeholder_memories">Tu pojawią się Twoje wspomnienia z meczów.</string>
 </resources>
