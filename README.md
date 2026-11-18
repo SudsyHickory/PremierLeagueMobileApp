@@ -2,7 +2,7 @@
 
 Natywna aplikacja na Androida (Kotlin, Jetpack Compose) dla kibiców angielskiej Premier League. Łączy aktualne informacje o lidze (wyniki, terminarz, tabela) z osobistym **Dziennikiem kibica**, w którym użytkownik zapisuje wspomnienia z obejrzanych meczów – ze zdjęciami, filmami, notatką głosową i lokalizacją.
 
-> **Status:** Etap 1 – fundament aplikacji (w toku). Implementacja przebiega w pionowych wycinkach (vertical slices).
+> **Status:** Etap 2 – model domenowy i mocki (zakończony); następny: Etap 3 – Tabela. Implementacja przebiega w pionowych wycinkach (vertical slices).
 >
 > 📄 **Pełna dokumentacja projektu:** [Premier_League_App_opis_projektu.pdf](Premier_League_App_opis_projektu.pdf) – opis funkcji, wszystkie ekrany i ich stany, plan implementacji, podejście offline-first, strategia mocków, technologie oraz diagramy architektury MVVM.
 
