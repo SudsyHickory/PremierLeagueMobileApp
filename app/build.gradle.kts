@@ -21,6 +21,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Wariant "mock" działa na danych z makiet (Fake…Repository),
+    // "prod" – na prawdziwym API (Default…Repository, od etapu 8).
+    flavorDimensions += "data"
+    productFlavors {
+        create("mock") {
+            dimension = "data"
+            applicationIdSuffix = ".mock"
+        }
+        create("prod") {
+            dimension = "data"
+        }
+    }
+
     buildTypes {
         release {
             optimization {
@@ -49,8 +62,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
+    implementation(libs.kotlinx.coroutines.core)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)

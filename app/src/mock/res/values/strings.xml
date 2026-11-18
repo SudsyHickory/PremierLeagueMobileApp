@@ -1,0 +1,4 @@
+<resources>
+    <!-- Inna nazwa niż w wariancie prod, żeby odróżnić obie instalacje na telefonie. -->
+    <string name="app_name">Premier League (mock)</string>
+</resources>

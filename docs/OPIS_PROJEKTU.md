@@ -378,14 +378,16 @@ Dodatkowe korzyści:
 
 ## 8. Stan repozytorium dzisiaj
 
-Stan na 13 listopada 2026, gałąź `feature/E1`.
+Stan na 13 listopada 2026, gałąź `feature/E2` (po etapie 2).
 
 **Co już jest:**
 
 - dokumentacja (README, PDF, zrzuty makiet w `docs/screenshots`),
-- projekt wygenerowany z szablonu Android Studio „Empty Activity”: jeden moduł `:app`, pakiet `com.example.premierleagueapp`,
-- [MainActivity.kt](../app/src/main/java/com/example/premierleagueapp/MainActivity.kt) z szablonowym `Greeting("Android")` w `Scaffold`,
-- domyślny motyw szablonu w `ui/theme` (fioletowa paleta, włączone kolory dynamiczne) – jeszcze nie motyw z Figmy.
+- jeden moduł `:app`, pakiet `com.example.premierleagueapp`,
+- **etap 1:** Hilt (`PremierLeagueApplication`, `MainActivity`), motyw z Figmy w `ui/theme`, szkielet [PremierLeagueApp.kt](../app/src/main/java/com/example/premierleagueapp/ui/PremierLeagueApp.kt) z dolną nawigacją i czterema zakładkami-zaślepkami,
+- **etap 2:** model domenowy w `domain/model`, interfejsy repozytoriów w `domain/repository`, product flavors `mock` i `prod`, fake repozytoria ligowe z danymi z makiet (`app/src/mock/…/data/fake`), moduł Hilt wariantu `mock` oraz testy fake'ów (`app/src/testMock`).
+
+**Dane w wariancie mock** ([MockData.kt](../app/src/mock/java/com/example/premierleagueapp/data/fake/MockData.kt)): tabela 20 drużyn w trzech wariantach, kolejki 7–9 (8 i trzy pierwsze mecze 9 według makiet, reszta dopisana), informacje o lidze. Zachowanie fake'ów ustawia `FakeConfig` w `MockRepositoryModule`: opóźnienie odświeżania, wymuszony błąd, start bez danych.
 
 **Konfiguracja budowania:**
 
@@ -400,9 +402,11 @@ Stan na 13 listopada 2026, gałąź `feature/E1`.
 | Java | 11 |
 | Katalog wersji | [gradle/libs.versions.toml](../gradle/libs.versions.toml) |
 
-**Czego jeszcze nie ma** (względem planu): Navigation Compose, Hilt, product flavors, Retrofit/OkHttp, kotlinx.serialization, Room, Coil, Media3, usługi lokalizacji, MockK, Turbine; brak warstw `domain` i `data`; manifest nie deklaruje żadnych uprawnień (`INTERNET`, `RECORD_AUDIO`, `ACCESS_COARSE_LOCATION`); `BuildConfig` nie jest włączony i klucz API nie jest jeszcze czytany z `local.properties`.
+**Czego jeszcze nie ma** (względem planu): ViewModele i właściwe ekrany, Retrofit/OkHttp, kotlinx.serialization, Room, Coil, Media3, usługi lokalizacji, MockK; implementacja `MemoriesRepository` (jest sam interfejs); wariant `prod` nie ma jeszcze żadnych repozytoriów; manifest nie deklaruje żadnych uprawnień (`INTERNET`, `RECORD_AUDIO`, `ACCESS_COARSE_LOCATION`); `BuildConfig` nie jest włączony i klucz API nie jest jeszcze czytany z `local.properties`.
 
-Wniosek: etap 0 jest zakończony, a projekt stoi na samym początku etapu 1.
+**Uwaga do wariantu `prod`:** od etapu 3 ViewModele wstrzykują repozytoria ligowe, a `prod` dostaje ich implementacje dopiero w etapie 8. W tym czasie buduje się tylko wariant `mock` – w Android Studio trzeba mieć wybrany `mockDebug`.
+
+Wniosek: etapy 0–2 są zakończone, następny jest etap 3 (Tabela).
 
 ---
 
@@ -670,5 +674,9 @@ Niespójności i luki zauważone w dokumentacji, rozstrzygnięte 13 listopada 20
 | 4 | Szablonowy motyw ma `dynamicColor = true`, co na Androidzie 12+ zastępuje paletę z Figmy | Kolory dynamiczne wyłączone; zawsze paleta z Figmy | Etap 1 |
 | 5 | Dokumentacja nie określa, co wspomnienie przechowuje o meczu | Wpis zapisuje identyfikator meczu i niezmienną kopię jego danych | Etap 6 |
 | 6 | `applicationId` to szablonowe `com.example.premierleagueapp` | Zostaje bez zmian; wariant mock dostaje przyrostek `.mock` | Etap 2 |
+| 7 | Dokumentacja wymaga informacji „Zaktualizowano X min temu”, ale kontrakt repozytoriów (`observe…()` + `refresh(force)`) nie mówi, skąd ViewModel bierze czas | Każde repozytorium ligowe ma `observeLastUpdated(): Flow<Instant?>`; `null` oznacza brak danych | Etapy 2–5, 9 |
+| 8 | Dokumentacja nie określa typu błędu odświeżania | `refresh()` zgłasza wyłącznie `RefreshException` z powodem: brak połączenia, limit API, inny. Fake'i i przyszłe `Default…Repository` używają tego samego typu, więc ViewModele nie zmieniają się w etapie 8 | Etapy 2–5, 8 |
+| 9 | Jak model `Memory` ma przechowywać kopię danych meczu (decyzja 5) | `Memory.match` to pełny obiekt `Match` zapisany w chwili utworzenia wpisu | Etapy 2, 6, 7a |
+| 10 | `MatchesRepository` musi obsłużyć ekran Mecze (jedna kolejka) oraz Start i wybór meczu we wspomnieniu (wiele kolejek) | Dwa strumienie: `observeMatchday(matchday)` i `observeMatches()` dla całego sezonu | Etapy 2, 4, 5, 7a |
 
 Decyzja 3 jest jedynym odstępstwem od PDF (Diagram B) – przy okazji aktualizacji dokumentacji warto poprawić tam kształt `StandingsUiState`.
