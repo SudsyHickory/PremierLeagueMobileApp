@@ -48,3 +48,12 @@ val DarkSurfaceContainerHigh = Color(0xFF2B2930)
 val DarkSurfaceContainerHighest = Color(0xFF36343B)
 val DarkOutline = Color(0xFF938F99)
 val DarkOutlineVariant = Color(0xFF49454F)
+
+// Kolory stref tabeli (numer pozycji): Liga Mistrzów, Liga Europy, spadek.
+val LightZoneChampionsLeague = Color(0xFF1565C0)
+val LightZoneEuropaLeague = Color(0xFFE65100)
+val LightZoneRelegation = Color(0xFFC62828)
+
+val DarkZoneChampionsLeague = Color(0xFF90CAF9)
+val DarkZoneEuropaLeague = Color(0xFFFFB74D)
+val DarkZoneRelegation = Color(0xFFEF9A9A)

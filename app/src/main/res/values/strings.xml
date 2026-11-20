@@ -14,7 +14,45 @@
     <string name="memories_subtitle">Dziennik kibica</string>
 
     <string name="placeholder_start">Tu pojawi się podsumowanie ligi: ostatnie wyniki, najbliższe mecze i top 5 tabeli.</string>
-    <string name="placeholder_standings">Tu pojawi się pełna tabela ligowa.</string>
     <string name="placeholder_matches">Tu pojawi się terminarz i wyniki kolejki.</string>
     <string name="placeholder_memories">Tu pojawią się Twoje wspomnienia z meczów.</string>
+
+    <!-- Wspólne: odświeżanie, wiek danych, błędy -->
+    <string name="action_refresh">Odśwież</string>
+    <string name="action_retry">Spróbuj ponownie</string>
+    <string name="action_retry_short">Ponów</string>
+    <string name="loading_data">Ładowanie danych…</string>
+    <string name="refreshing">Odświeżanie…</string>
+    <string name="updated_just_now">Zaktualizowano przed chwilą</string>
+    <string name="updated_minutes_ago">Zaktualizowano %1$d min temu</string>
+    <string name="updated_hours_ago">Zaktualizowano %1$d godz. temu</string>
+    <plurals name="updated_days_ago">
+        <item quantity="one">Zaktualizowano %1$d dzień temu</item>
+        <item quantity="few">Zaktualizowano %1$d dni temu</item>
+        <item quantity="many">Zaktualizowano %1$d dni temu</item>
+        <item quantity="other">Zaktualizowano %1$d dnia temu</item>
+    </plurals>
+
+    <string name="error_no_connection_title">Brak połączenia</string>
+    <string name="error_no_connection_message">Nie udało się pobrać danych o lidze. Sprawdź połączenie z internetem i spróbuj ponownie.</string>
+    <string name="error_rate_limited_title">Zbyt wiele zapytań</string>
+    <string name="error_rate_limited_message">Przekroczono limit zapytań do serwera danych. Odczekaj chwilę i spróbuj ponownie.</string>
+    <string name="error_unknown_title">Coś poszło nie tak</string>
+    <string name="error_unknown_message">Nie udało się pobrać danych o lidze. Spróbuj ponownie.</string>
+    <string name="refresh_failed">Nie udało się odświeżyć danych</string>
+    <string name="refresh_failed_rate_limited">Limit zapytań wyczerpany – spróbuj za chwilę</string>
+
+    <!-- Tabela -->
+    <string name="standings_subtitle_season">Tabela • sezon %1$d/%2$02d</string>
+    <string name="standings_type_total">Ogółem</string>
+    <string name="standings_type_home">U siebie</string>
+    <string name="standings_type_away">Na wyjeździe</string>
+    <string name="standings_column_position">#</string>
+    <string name="standings_column_team">Drużyna</string>
+    <string name="standings_column_played">M</string>
+    <string name="standings_column_goal_difference">+/-</string>
+    <string name="standings_column_points">Pkt</string>
+    <string name="zone_champions_league">Liga Mistrzów</string>
+    <string name="zone_europa_league">Liga Europy</string>
+    <string name="zone_relegation">Spadek</string>
 </resources>

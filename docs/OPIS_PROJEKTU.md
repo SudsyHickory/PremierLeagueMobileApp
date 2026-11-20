@@ -218,9 +218,9 @@ Każdy ekran ma własny `sealed interface` o trzech stanach:
 
 - `Loading` – pierwsze ładowanie, brak danych,
 - `Content(dane, isRefreshing)` – dane z cache, także w trakcie odświeżania,
-- `Error(message)` – **wyłącznie** gdy odświeżenie się nie udało, a danych nie ma (pełny ekran błędu z „Spróbuj ponownie”).
+- `Error(reason)` – **wyłącznie** gdy odświeżenie się nie udało, a danych nie ma (pełny ekran błędu z „Spróbuj ponownie”).
 
-Nieudane odświeżenie przy istniejących danych **nie zmienia stanu** – ekran zostaje w `Content`, a ViewModel wysyła jednorazowe zdarzenie, które ekran pokazuje jako snackbar „Ponów” (decyzja 3 w rozdziale 10). Dla Tabeli:
+Nieudane odświeżenie przy istniejących danych **nie zmienia stanu** – ekran zostaje w `Content`, a ViewModel wysyła jednorazowe zdarzenie, które ekran pokazuje jako snackbar „Ponów” (decyzja 3 w rozdziale 10). Stany i zdarzenia niosą powód błędu (`RefreshException.Reason`), a nie gotowy tekst – na tekst zamienia go ekran (decyzja 11). Dla Tabeli (stan po etapie 3):
 
 ```kotlin
 sealed interface StandingsUiState {
@@ -229,19 +229,26 @@ sealed interface StandingsUiState {
         val rows: List<StandingRow>,
         val type: StandingType,
         val isRefreshing: Boolean,
-        val lastUpdated: /* czas aktualizacji */
+        val lastUpdated: Instant?,
+        val season: Season?          // podtytuł „Tabela • sezon 2026/27” (decyzja 12)
     ) : StandingsUiState
-    data class Error(val message: String) : StandingsUiState
+    data class Error(val reason: RefreshException.Reason) : StandingsUiState
 }
 
 sealed interface StandingsEvent {
-    data class RefreshFailed(val message: String) : StandingsEvent
+    data class RefreshFailed(val reason: RefreshException.Reason) : StandingsEvent
 }
 ```
 
-`StandingsViewModel` wystawia `uiState: StateFlow<StandingsUiState>`, strumień zdarzeń `events: Flow<StandingsEvent>` oraz akcje `onRefresh()` i `onTypeSelected(type)`.
+`StandingsViewModel` wystawia `uiState: StateFlow<StandingsUiState>`, strumień zdarzeń `events: Flow<StandingsEvent>` oraz akcje `onRefresh()`, `onRetry()` i `onTypeSelected(type)`. Przy utworzeniu wywołuje `refresh(force = false)` – tak pusty cache (lub pusty fake) wypełnia się przy pierwszym wejściu na ekran.
 
 To świadome odstępstwo od Diagramu B w PDF, gdzie `Error` ma jeszcze pole `cachedRows`.
+
+**Wzorzec ekranu (ustalony w etapie 3, powtarzany w kolejnych):**
+
+- ekran dzieli się na część stanową `…Route` (`hiltViewModel()`, `collectAsStateWithLifecycle()`, zdarzenia → snackbar przez `ObserveAsEvents`) i bezstanową `…Screen(uiState, akcje)`, na której są podglądy i testy UI;
+- wspólne elementy stanów są w `ui/components`: `LastUpdatedChip` (wiek danych, `updatedAgo()`), `FullScreenError`, `SkeletonBlock`, `TeamBadge`, mapowanie powodu błędu na tekst (`RefreshErrorText.kt`);
+- ViewModel testuje się w `app/src/testMock` na prawdziwych fake'ach z wirtualnym czasem (`MainDispatcherRule` + `runTest`, Turbine dla zdarzeń).
 
 ### 4.5 Wycinek „Tabela” – przepływ pull-to-refresh (odpowiednik Diagramu B)
 
@@ -378,14 +385,15 @@ Dodatkowe korzyści:
 
 ## 8. Stan repozytorium dzisiaj
 
-Stan na 13 listopada 2026, gałąź `feature/E2` (po etapie 2).
+Stan na 18 listopada 2026, gałąź `feature/E3` (po etapie 3).
 
 **Co już jest:**
 
 - dokumentacja (README, PDF, zrzuty makiet w `docs/screenshots`),
 - jeden moduł `:app`, pakiet `com.example.premierleagueapp`,
 - **etap 1:** Hilt (`PremierLeagueApplication`, `MainActivity`), motyw z Figmy w `ui/theme`, szkielet [PremierLeagueApp.kt](../app/src/main/java/com/example/premierleagueapp/ui/PremierLeagueApp.kt) z dolną nawigacją i czterema zakładkami-zaślepkami,
-- **etap 2:** model domenowy w `domain/model`, interfejsy repozytoriów w `domain/repository`, product flavors `mock` i `prod`, fake repozytoria ligowe z danymi z makiet (`app/src/mock/…/data/fake`), moduł Hilt wariantu `mock` oraz testy fake'ów (`app/src/testMock`).
+- **etap 2:** model domenowy w `domain/model`, interfejsy repozytoriów w `domain/repository`, product flavors `mock` i `prod`, fake repozytoria ligowe z danymi z makiet (`app/src/mock/…/data/fake`), moduł Hilt wariantu `mock` oraz testy fake'ów (`app/src/testMock`),
+- **etap 3:** zakładka Tabela – `StandingsViewModel` + `StandingsUiState`/`StandingsEvent`, ekran z przełącznikiem Ogółem / U siebie / Na wyjeździe, pull-to-refresh, chipem wieku danych, strefami (kolory w `LeagueColors` motywu) i legendą, wszystkie stany (szkielety, treść, odświeżanie, snackbar „Ponów”, pełny ekran błędu); komponenty wspólne w `ui/components`; zależności `lifecycle-runtime-compose`, `lifecycle-viewmodel-compose`, `hilt-lifecycle-viewmodel-compose`; testy `StandingsViewModelTest`, `StandingZoneTest`, `UpdatedAgoTest` oraz testy UI `StandingsScreenTest` i `NavigationTest` (uruchamia `MainActivity`, bo ekrany biorą ViewModele z Hilt).
 
 **Dane w wariancie mock** ([MockData.kt](../app/src/mock/java/com/example/premierleagueapp/data/fake/MockData.kt)): tabela 20 drużyn w trzech wariantach, kolejki 7–9 (8 i trzy pierwsze mecze 9 według makiet, reszta dopisana), informacje o lidze. Zachowanie fake'ów ustawia `FakeConfig` w `MockRepositoryModule`: opóźnienie odświeżania, wymuszony błąd, start bez danych.
 
@@ -402,11 +410,11 @@ Stan na 13 listopada 2026, gałąź `feature/E2` (po etapie 2).
 | Java | 11 |
 | Katalog wersji | [gradle/libs.versions.toml](../gradle/libs.versions.toml) |
 
-**Czego jeszcze nie ma** (względem planu): ViewModele i właściwe ekrany, Retrofit/OkHttp, kotlinx.serialization, Room, Coil, Media3, usługi lokalizacji, MockK; implementacja `MemoriesRepository` (jest sam interfejs); wariant `prod` nie ma jeszcze żadnych repozytoriów; manifest nie deklaruje żadnych uprawnień (`INTERNET`, `RECORD_AUDIO`, `ACCESS_COARSE_LOCATION`); `BuildConfig` nie jest włączony i klucz API nie jest jeszcze czytany z `local.properties`.
+**Czego jeszcze nie ma** (względem planu): ViewModele i ekrany Mecze, Start i Dziennik kibica, Retrofit/OkHttp, kotlinx.serialization, Room, Coil, Media3, usługi lokalizacji, MockK; implementacja `MemoriesRepository` (jest sam interfejs); wariant `prod` nie ma jeszcze żadnych repozytoriów; manifest nie deklaruje żadnych uprawnień (`INTERNET`, `RECORD_AUDIO`, `ACCESS_COARSE_LOCATION`); `BuildConfig` nie jest włączony i klucz API nie jest jeszcze czytany z `local.properties`.
 
 **Uwaga do wariantu `prod`:** od etapu 3 ViewModele wstrzykują repozytoria ligowe, a `prod` dostaje ich implementacje dopiero w etapie 8. W tym czasie buduje się tylko wariant `mock` – w Android Studio trzeba mieć wybrany `mockDebug`.
 
-Wniosek: etapy 0–2 są zakończone, następny jest etap 3 (Tabela).
+Wniosek: etapy 0–3 są zakończone, następny jest etap 4 (Mecze).
 
 ---
 
@@ -678,5 +686,7 @@ Niespójności i luki zauważone w dokumentacji, rozstrzygnięte 13 listopada 20
 | 8 | Dokumentacja nie określa typu błędu odświeżania | `refresh()` zgłasza wyłącznie `RefreshException` z powodem: brak połączenia, limit API, inny. Fake'i i przyszłe `Default…Repository` używają tego samego typu, więc ViewModele nie zmieniają się w etapie 8 | Etapy 2–5, 8 |
 | 9 | Jak model `Memory` ma przechowywać kopię danych meczu (decyzja 5) | `Memory.match` to pełny obiekt `Match` zapisany w chwili utworzenia wpisu | Etapy 2, 6, 7a |
 | 10 | `MatchesRepository` musi obsłużyć ekran Mecze (jedna kolejka) oraz Start i wybór meczu we wspomnieniu (wiele kolejek) | Dwa strumienie: `observeMatchday(matchday)` i `observeMatches()` dla całego sezonu | Etapy 2, 4, 5, 7a |
+| 11 | §4.4 przewidywał `Error(message: String)` i `RefreshFailed(message: String)`, czyli tekst składany w ViewModelu | Stany i zdarzenia niosą `RefreshException.Reason`; tekst wybiera ekran z `strings.xml` (`RefreshErrorText.kt`). ViewModel nie zależy od zasobów Androida i łatwo go testować | Etapy 3–5 |
+| 12 | Makieta Tabeli ma podtytuł „Tabela • sezon 2026/27”, a sezon jest w `CompetitionRepository` | `StandingsViewModel` obserwuje też `CompetitionRepository` i przy starcie odświeża je z `force = false`; błąd tego odświeżenia jest ignorowany, a bez danych podtytuł to samo „Tabela” | Etap 3 |
 
-Decyzja 3 jest jedynym odstępstwem od PDF (Diagram B) – przy okazji aktualizacji dokumentacji warto poprawić tam kształt `StandingsUiState`.
+Decyzje 3 i 11 są jedynymi odstępstwami od PDF i §4.4 (Diagram B) – przy okazji aktualizacji dokumentacji warto poprawić tam kształt `StandingsUiState`.

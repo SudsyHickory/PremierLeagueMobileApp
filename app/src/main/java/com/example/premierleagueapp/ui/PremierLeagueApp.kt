@@ -22,7 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.premierleagueapp.ui.matches.MatchesScreen
 import com.example.premierleagueapp.ui.memories.MemoriesScreen
 import com.example.premierleagueapp.ui.navigation.TopLevelDestination
-import com.example.premierleagueapp.ui.standings.StandingsScreen
+import com.example.premierleagueapp.ui.standings.StandingsRoute
 import com.example.premierleagueapp.ui.start.StartScreen
 
 /**
@@ -44,7 +44,7 @@ fun PremierLeagueApp(
                 .consumeWindowInsets(innerPadding)
         ) {
             composable(TopLevelDestination.START.route) { StartScreen() }
-            composable(TopLevelDestination.STANDINGS.route) { StandingsScreen() }
+            composable(TopLevelDestination.STANDINGS.route) { StandingsRoute() }
             composable(TopLevelDestination.MATCHES.route) { MatchesScreen() }
             composable(TopLevelDestination.MEMORIES.route) { MemoriesScreen() }
         }
